@@ -168,6 +168,7 @@ INT_TYPE is set to level sensitive.
 #define INT_ANY_2           0x000002A4
 #define INT_ANY_3           0x000002E4
 
+#include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -309,11 +310,11 @@ int rtapi_app_main(void)
     // zynq and FPGA code revision
     int rev, zrev;
     // save messaging level 
-    // static int msg_level;
+    static int msg_level;
     int n, retval = 0;
     
     // save message level on entering 
-    // msg_level = rtapi_get_msg_level();
+    msg_level = rtapi_get_msg_level();
     
     /* force messaging level in:
     RTAPI_MSG_NONE,
