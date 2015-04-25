@@ -1269,9 +1269,9 @@ endif
 
 ifdef TARGET_PLATFORM_ZEDBOARD
 obj-$(CONFIG_HAL_GPIO) += hal_zed_gpio.o
-hal_zed_gpio-objs := hal/drivers/hal_zed_gpio.o
+hal_zed_gpio-objs := hal/drivers/zedboard/hal_zed_gpio.o
 obj-$(CONFIG_HAL_CAN) += hal_zed_can.o
-hal_zed_can-objs := hal/drivers/hal_zed_can.o
+hal_zed_can-objs := hal/drivers/zedboard/hal_zed_can.o
 endif
 
 obj-m += hal_arm335xQEP.o
