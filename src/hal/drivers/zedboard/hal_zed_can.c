@@ -90,12 +90,15 @@
 #if !defined(TARGET_PLATFORM_ZEDBOARD)
     #error "This driver is for the Zedboard platform only"
 #endif
+/**
+ \todo Check that the driver is built only when Xenomai threads are configured 
+*/
 
 #include <unistd.h>
 
 #include <unistd.h>
 
-/// #include <xenomai/rtdm/rtcan.h>
+#include <xenomai/rtdm/rtcan.h>
 
 #include "2FOC_status.h"
 
@@ -313,7 +316,7 @@ int rtapi_app_main(void)
     // init RT-CAN
     // create sockets
     for (n = 0; n < num_chan; n++) {
-        /// ret = rt_dev_socket(PF_CAN, SOCK_RAW, CAN_RAW);
+        ret = rt_dev_socket(PF_CAN, SOCK_RAW, CAN_RAW);
         if (ret < 0) {
             rtapi_print_msg(RTAPI_MSG_ERR, "HAL_ZED_CAN: ERROR: rt_dev_socket: %s\n", strerror(-ret));
             hal_exit(comp_id);
@@ -321,6 +324,7 @@ int rtapi_app_main(void)
         }
         sock[n] = ret;
     }
+    rtapi_print_msg(RTAPI_MSG_INFO, "HAL_ZED_CAN: RT-CAN sockets from %d to %d created successfully.\n",sock[0], sock[num_chan-1] );
 
     // all operations succeded
     rtapi_print_msg(RTAPI_MSG_INFO, "HAL_ZED_CAN: driver installed successfully.\n");

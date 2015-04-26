@@ -216,6 +216,7 @@ SUBDIRS := \
 	hal \
 	hal/support \
 	hal/drivers/hal_pru_generic \
+    hal/drivers/zedboard \
 	hal/simdrivers \
 	hal/cython \
 	\

@@ -1,0 +1,3 @@
+ifdef TARGET_PLATFORM_ZEDBOARD
+
+endif
