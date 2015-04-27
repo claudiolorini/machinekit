@@ -98,7 +98,7 @@
 
 #include <unistd.h>
 
-#include <xenomai/rtdm/rtcan.h>
+#include <rtdm/rtcan.h>
 
 #include "2FOC_status.h"
 

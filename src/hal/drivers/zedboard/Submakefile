@@ -1,3 +1,8 @@
 ifdef TARGET_PLATFORM_ZEDBOARD
-
+obj-$(CONFIG_HAL_ZED_GPIO) += hal_zed_gpio.o
+hal_zed_gpio-objs := hal/drivers/zedboard/hal_zed_gpio.o
+# CONFIG_HAL_CAN define if build as module
+obj-$(CONFIG_HAL_ZED_CAN) += hal_zed_can.o
+hal_zed_can-objs := hal/drivers/zedboard/hal_zed_can.o
 endif
+

@@ -730,7 +730,7 @@ else
 	platform_raspberry_reason="$arch_enab_msg"
     fi
     if test $TARGET_PLATFORM_ZEDBOARD = unk; then
-        TARGET_PLATFORM_ZEDBOARD=false
+        TARGET_PLATFORM_ZEDBOARD=true
 	platform_zedboard_reason="$arch_disab_msg" 
     fi
 fi

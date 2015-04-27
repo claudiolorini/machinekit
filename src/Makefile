@@ -216,7 +216,7 @@ SUBDIRS := \
 	hal \
 	hal/support \
 	hal/drivers/hal_pru_generic \
-    hal/drivers/zedboard \
+	hal/drivers/zedboard \
 	hal/simdrivers \
 	hal/cython \
 	\
@@ -1266,14 +1266,6 @@ obj-$(CONFIG_HAL_GPIO) += hal_bb_gpio.o
 hal_bb_gpio-objs := hal/drivers/hal_bb_gpio.o
 obj-$(CONFIG_PEPPER) += pepper.o
 pepper-objs := hal/components/pepper.o $(MATHSTUB)
-endif
-
-ifdef TARGET_PLATFORM_ZEDBOARD
-obj-$(CONFIG_HAL_GPIO) += hal_zed_gpio.o
-hal_zed_gpio-objs := hal/drivers/zedboard/hal_zed_gpio.o
-# CONFIG_HAL_CAN define if build as module
-obj-$(CONFIG_HAL_CAN) += hal_zed_can.o
-hal_zed_can-objs := hal/drivers/zedboard/hal_zed_can.o
 endif
 
 obj-m += hal_arm335xQEP.o
