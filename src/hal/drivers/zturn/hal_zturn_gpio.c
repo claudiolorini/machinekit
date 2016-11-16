@@ -18,7 +18,8 @@
 \brief Zynq gpio peripheral register mapping from ug585-Zynq-7000-TRM.pdf 
 
 \details This driver profides 12 insulated digital inputs and 
-6 insulated digital outputs and 10 not insulated digital IO 
+6 insulated digital outputs and 5 not insulated digital outputs (PMODA)
+and 5 not insulated digital inputs (PMODB)
 using the IC84M board on Z-Turn platform.
 
 In order to mantain rt performances the access to the peripheral is
@@ -53,8 +54,8 @@ I7..8     J5
 I9..12    J6
 O1..3     J20
 O4..6     J21
-PMODA1..5 J24 
-PMODB1..5 J25
+PMODA1..5 J24 (not insulated outputs)
+PMODB1..5 J25 (not insulated inputs)
 
 \par Revision history:
 \date  26.11.2016 started development from hal_gpio.c files
@@ -98,10 +99,10 @@ static int comp_id;
 hal_bit_t **oport_data;
 hal_bit_t **iport_data;
 
-// number of available isogpin
-#define  NGPI 12
-// number of available isogpout
-#define  NGPO  6
+// number of available isogpin + gpin
+#define  NGPI (12+5)
+// number of available isogpout + gpout
+#define  NGPO  (6+5)
 
 // pointer to start of GPIO pheriferal registers
 void *base;
@@ -114,7 +115,7 @@ unsigned *RDATA_3;
 int fd;
 
 /**
- \brief Write IO function exported to hal
+ \brief Write insulated outputs (6) and not insulated outputs (5) 
  \pre ngpio and base must be initialized */
 static void write_port(void *arg, long period)
 {
@@ -137,6 +138,7 @@ static void write_port(void *arg, long period)
  \pre ngpio must be initialized  */
 static void read_port(void *arg, long period)
 {
+    // insulated inputs
     *iport_data[0]  = RTAPI_BIT_TEST(RDATA_2_RO, 28);
     *iport_data[1]  = RTAPI_BIT_TEST(RDATA_2_RO, 29);
     *iport_data[2]  = RTAPI_BIT_TEST(RDATA_2_RO, 30);
@@ -151,6 +153,13 @@ static void read_port(void *arg, long period)
     *iport_data[9]  = RTAPI_BIT_TEST(RDATA_3_RO, 5);
     *iport_data[10] = RTAPI_BIT_TEST(RDATA_3_RO, 6);
     *iport_data[11] = RTAPI_BIT_TEST(RDATA_3_RO, 7);
+
+    // not insulated inputs on PMODB
+    *iport_data[12] = RTAPI_BIT_TEST(RDATA_3_RO, 19);
+    *iport_data[13] = RTAPI_BIT_TEST(RDATA_3_RO, 20);
+    *iport_data[14] = RTAPI_BIT_TEST(RDATA_3_RO, 21);
+    *iport_data[15] = RTAPI_BIT_TEST(RDATA_3_RO, 22);
+    *iport_data[16] = RTAPI_BIT_TEST(RDATA_3_RO, 23);
 }
 
 /**
@@ -163,6 +172,7 @@ static void setup_gpio_access()
     unsigned *RDIRM_3 = base + DIRM_3;
     unsigned *ROEN_3  = base + OEN_3;
     unsigned *RMASK_DATA_3_LSW = base + MASK_DATA_3_LSW;
+    unsigned *RMASK_DATA_3_MSW = base + MASK_DATA_3_MSW;
 
     // configure EMIOs 
     // set LED1..LED8 as outputs
@@ -187,11 +197,16 @@ static void setup_gpio_access()
     *RMASK_DATA_3_LSW = *RMASK_DATA_3_LSW & 0xC0FF3F00;
 
     // \todo setup PMODs as I or O according to needs 
-    // set PMODA1..PMODA5 as inputs
-    *RDIRM_3 = *RDIRM_3 & 0xFFF83FFF;
+    // set PMODA1..PMODA5 as outputs
+    *RDIRM_3 = *RDIRM_3 | 0x0007C000;
+    // enable output drivers
+    *ROEN_3  = *ROEN_3  | 0x0007C000;
+    // MASK_DATA_x_ySW[15..0] contains the data to be written
+    *RMASK_DATA_3_LSW = *RMASK_DATA_3_LSW & 0x3FFFC000;
+    *RMASK_DATA_3_MSW = *RMASK_DATA_3_MSW & 0xFFF80007;
+
     // set PMODB1..PMODB5 as inputs
     *RDIRM_3 = *RDIRM_3 & 0xFF07FFFF;
-
 }
 
 /**
