@@ -1,0 +1,105 @@
+# 500usec thread + 10msec  thread
+loadrt threads name1=fast-thread period1=300000 name2=slow-thread period2=100000000 
+loadusr -Wn number pyvcp -c number number.xml
+
+# load GPIO driver
+loadrt                                  hal_zed_gpio 
+loadrt                                  hal_zed_can rtcan_ifn=0,1,2,3
+loadrt                                  siggen
+loadrt                                  conv_float_s32
+loadrt                                  conv_s32_float
+loadrt                                  not
+loadrt                                  posfromenc count=4
+
+# thread/function association
+addf hal_zed_gpio.read                  fast-thread
+addf hal_zed_gpio.write                 fast-thread
+addf hal_zed_can.rtcan_periodic_send    fast-thread
+addf siggen.0.update                    fast-thread
+addf conv-float-s32.0                   fast-thread
+addf conv-s32-float.0                   fast-thread
+addf not.0                              fast-thread
+addf posfromenc.0.compute               fast-thread
+addf posfromenc.1.compute               fast-thread
+addf posfromenc.2.compute               fast-thread
+addf posfromenc.3.compute               fast-thread
+
+# connections
+# emergency stop
+net estop                               <= hal_zed_gpio.pin-00-in
+net estop                               => hal_zed_can.0.estop
+net estop                               => hal_zed_can.1.estop
+net estop                               => hal_zed_can.2.estop
+net estop                               => hal_zed_can.3.estop
+
+# drive enable
+net driven                              <= hal_zed_gpio.pin-01-in
+net driven                              => not.0.in
+net ndriven                             <= not.0.out
+net ndriven                              => hal_zed_can.0.driven
+net ndriven                              => hal_zed_can.1.driven
+net ndriven                              => hal_zed_can.2.driven
+net ndriven                              => hal_zed_can.3.driven
+
+# set point generator
+net fpsp                                <= siggen.0.cosine
+net fpsp                                => conv-float-s32.0.in
+net u32sp                               <= conv-float-s32.0.out
+net u32sp                               => hal_zed_can.0.setpoint
+net u32sp                               => hal_zed_can.1.setpoint
+net u32sp                               => hal_zed_can.2.setpoint
+net u32sp                               => hal_zed_can.3.setpoint
+
+# visualization
+net encoderX                            <= hal_zed_can.0.feedback
+net encoderY                            <= hal_zed_can.1.feedback
+net encoderZ                            <= hal_zed_can.2.feedback
+net encoderA                            <= hal_zed_can.3.feedback
+
+net encoderX                            => number.dnumberX
+net encoderY                            => number.dnumberY
+net encoderZ                            => number.dnumberZ
+net encoderA                            => number.dnumberA
+
+net encoderX                            => posfromenc.0.encoder
+net encoderY                            => posfromenc.1.encoder
+net encoderZ                            => posfromenc.2.encoder
+net encoderA                            => posfromenc.3.encoder
+
+net fpositionX                          <= posfromenc.0.position
+net fpositionY                          <= posfromenc.1.position
+net fpositionZ                          <= posfromenc.2.position
+net fpositionA                          <= posfromenc.3.position
+
+net fpositionX                          => number.fnumberX
+net fpositionY                          => number.fnumberY
+net fpositionZ                          => number.fnumberZ
+net fpositionA                          => number.fnumberA
+
+net fpositionX                          => number.bar
+
+# parameters
+setp siggen.0.amplitude                 500                  
+setp siggen.0.frequency                 1
+
+setp posfromenc.0.screwgear             44
+setp posfromenc.1.screwgear             44
+setp posfromenc.2.screwgear             44
+setp posfromenc.3.screwgear             44
+
+setp posfromenc.0.motorgear             22
+setp posfromenc.1.motorgear             22
+setp posfromenc.2.motorgear             22
+setp posfromenc.3.motorgear             22
+
+setp posfromenc.0.screw                 5
+setp posfromenc.1.screw                 5
+setp posfromenc.2.screw                 5
+setp posfromenc.3.screw                 5
+
+# start realtime
+start
+
+#loadusr halshow
+#loadusr halscope
+

@@ -1,0 +1,11 @@
+#
+#  configurations for surface probe switch 
+#
+
+addf not.1                              servo-thread
+
+net probeswitch                         <= hal_zed_gpio.pin-06-in
+net probeswitch                         => not.1.in
+net nprobeswitch                        <= not.1.out
+net nprobeswitch                        => motion.probe-input
+

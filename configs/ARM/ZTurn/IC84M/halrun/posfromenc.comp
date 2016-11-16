@@ -1,0 +1,17 @@
+component posfromenc "Return position from encoder counts";
+
+// reduction gears + leadscrew
+param rw unsigned   motorgear   "Number of theets of the motor gear"; 
+param rw unsigned   screwgear   "Number of theets of the screw gear";
+param rw unsigned   screw       "leadscrew ratio in mm/turns";
+
+pin   in  s32       encoder     "encoder counts";
+pin   out float     position    "position in mm of the axis";
+
+function compute fp             "Compute position in mm from encoder counts and reductions.";
+license "GPL";
+
+;;
+FUNCTION(compute) {
+    position = ( (float) encoder / 65535.0) * (float) screw * ((float) motorgear / (float) screwgear) ; 
+}

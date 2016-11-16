@@ -1,0 +1,13 @@
+<pyvcp>
+<!-- input -->
+    <spinbox>
+        <halpin>"spval"</halpin>
+        <min_>-20</min_>
+        <max_>20</max_>
+        <initval>0</initval>
+        <resolution>1.0</resolution>
+        <format>"2.2f"</format>
+        <font>("Arial",20)</font>
+        <param_pin>1</param_pin> <!-- -->
+    </spinbox>
+</pyvcp>

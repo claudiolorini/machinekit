@@ -1,0 +1,22 @@
+#
+# GPIO on the CAN8 interface board 
+#
+
+# load/rt hal_zed_gpio module for GPIO with CAN8 boards
+loadrt                                  hal_zed_gpio
+# update IO on regular bases
+# addf hal_zed_gpio.write               servo-thread
+addf hal_zed_gpio.read                  servo-thread
+
+# signal inverter for E-Stop and touch probe
+loadrt                                  not count=3
+addf not.0                              servo-thread
+
+# Emergency STOP button from GPIO
+net estop                               <= hal_zed_gpio.pin-00-in
+net estop                               => not.0.in
+net nestop                              <= not.0.out
+
+# E-Stop connection to Axis
+net nestop                              => iocontrol.0.emc-enable-in 
+

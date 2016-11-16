@@ -483,8 +483,9 @@ KSOURCE_LOCATION_HINTS=$(echo \
 # TARGET_PLATFORM_CHIP
 # TARGET_PLATFORM_RASPBERRY
 # TARGET_PLATFORM_ZEDBOARD
+# TARGET_PLATFORM_ZTURN
 #
-# Platforms. set by --with-platform-{pc,beaglebone,chip,socfpga,raspberry,zedboard}
+# Platforms. set by --with-platform-{pc,beaglebone,chip,socfpga,raspberry,zedboard,zturn}
 # see Section 2.3 to enable other platforms, and 2.7 to AC_DEFINE it
 
 # xenomai equivalent of pkg-config
@@ -498,7 +499,7 @@ XENO_CONFIG=
 # Configure several basic features:                                          #
 # - some etc/linuxcnc/machinekit.ini  values                                 #
 # - the MKUUID instance UUID                                                 #
-# - Platform (PC, Raspberry Pi, CHIP, BeagleBone,SocFpga, Zedboard)                        #
+# - Platform (PC, Raspberry Pi,CHIP,BeagleBone,SocFpga,Zedboard,ZTurn)       #
 # - Common shared memory driver                                              #
 # - Parport I/O mode (portable or inb/outb)                                  #
 # - emcweb UI                                                                #
@@ -696,6 +697,35 @@ AC_ARG_WITH(platform-zedboard,
 	esac
     ])
 
+AC_ARG_WITH(platform-zturn,
+    [AS_HELP_STRING(
+        [--with-platform-zturn],
+	[Build for ZTurn platform])],
+    [
+        case $with_platform_zturn in
+	    (y*)
+	    	TARGET_PLATFORM_ZTURN=true
+		platform_specified=true
+		platform_zturn_reason="$cmdl_enab_msg"
+		;;
+	    (*)
+	    	TARGET_PLATFORM_ZTURN=false
+		platform_zturn_reason="$cmdl_disab_msg"
+		;;
+	esac
+    ],
+    [
+        case $host_cpu in
+	    (arm*)
+	        TARGET_PLATFORM_ZTURN=unk
+		;;
+	    (*)
+	    	TARGET_PLATFORM_ZTURN=false
+		platform_zturn_reason="$arch_disab_msg"
+		;;
+	esac
+    ])
+
 if $platform_specified; then
     # Platform was explicitly specified using --with-platform-*;
     # disable anything not explicitly specified
@@ -722,6 +752,10 @@ if $platform_specified; then
     if test $TARGET_PLATFORM_ZEDBOARD = unk; then
 	TARGET_PLATFORM_ZEDBOARD=false
 	platform_zedboard_reason="$cmdl_notspec_msg"
+    fi
+    if test $TARGET_PLATFORM_ZTURN = unk; then
+	TARGET_PLATFORM_ZTURN=false
+	platform_zturn_reason="$cmdl_notspec_msg"
     fi
 else
     # Platform was not explicitly specified; enable anything
@@ -751,6 +785,10 @@ else
         TARGET_PLATFORM_ZEDBOARD=true
 	platform_zedboard_reason="$arch_enab_msg"
     fi
+    if test $TARGET_PLATFORM_ZTURN = unk; then
+        TARGET_PLATFORM_ZTURN=true
+	platform_zturn_reason="$arch_enab_msg"
+    fi
 fi
 
 # Print messages about what platforms are to be enabled or disabled
@@ -771,6 +809,9 @@ AC_MSG_RESULT([$platform_raspberry_reason])
 
 AC_MSG_CHECKING(platform-zedboard)
 AC_MSG_RESULT([$platform_zedboard_reason])
+
+AC_MSG_CHECKING(platform-zturn)
+AC_MSG_RESULT([$platform_zturn_reason])
 
 # every Machinekit instance needs a unique ID, so generate here.
 # Can be changed later in etc/linuxcnc/machinekit.ini
@@ -1829,6 +1870,12 @@ if $TARGET_PLATFORM_ZEDBOARD; then
    target_platform_zedboard_val=yes
 fi
 AC_SUBST(TARGET_PLATFORM_ZEDBOARD,$target_platform_zedboard_val)
+
+if $TARGET_PLATFORM_ZTURN; then
+   AC_DEFINE(TARGET_PLATFORM_ZTURN, [], [build for ZTurn platform])
+   target_platform_zturn_val=yes
+fi
+AC_SUBST(TARGET_PLATFORM_ZTURN,$target_platform_zturn_val)
 
 ############################################################
 # thread-specific -DDEFINE and Makefile.inc variables

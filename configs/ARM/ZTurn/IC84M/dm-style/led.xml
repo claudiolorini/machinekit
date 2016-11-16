@@ -1,0 +1,153 @@
+<pyvcp>
+<!-- Status and errors of 2FOC boards -->
+
+<vbox>
+    <labelframe text="Status">
+        <hbox>
+	        <led>
+	            <halpin>"x.status.speed"</halpin>
+	            <size>20</size>
+	            <on_color>"green"</on_color>
+	            <off_color>"black"</off_color>
+	        </led> <label> <text>"  Speed control"</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.status.ra"</halpin>
+	            <size>20</size>
+	            <on_color>"green"</on_color>
+	            <off_color>"black"</off_color>
+	        </led> <label> <text>"  Rotor aligned"</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.status.switchedon"</halpin>
+	            <size>20</size>
+	            <on_color>"green"</on_color>
+	            <off_color>"black"</off_color>
+	        </led> <label> <text>"  Switched on"</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.status.operationenabled"</halpin>
+	            <size>20</size>
+	            <on_color>"green"</on_color>
+	            <off_color>"black"</off_color>
+	        </led> <label> <text>"  Operation enabled  "</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.status.shutteddown"</halpin>
+	            <size>20</size>
+	            <on_color>"green"</on_color>
+	            <off_color>"black"</off_color>
+	        </led> <label> <text>"  Shutted down"</text> <justify>"right"</justify> </label>
+        </hbox>
+    </labelframe>
+
+<!-- - - - - - - - - - - - - - - - Errors - - - - - - - - - - - - - - - -->
+
+    <labelframe text="Errors">
+        <hbox>
+	        <led>
+	            <halpin>"x.error.e0"</halpin>
+	            <size>20</size>
+	            <on_color>"red"</on_color>
+	            <off_color>"black"</off_color>
+	        </led>
+	        <label> <text>"  HES value"</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.error.e1"</halpin>
+	            <size>20</size>
+	            <on_color>"red"</on_color>
+	            <off_color>"black"</off_color>
+	        </led>
+	        <label> <text>"  HES sequence"</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.error.e2"</halpin>
+	            <size>20</size>
+	            <on_color>"red"</on_color>
+	            <off_color>"black"</off_color>
+	        </led>
+	        <label> <text>"  ADC calibration"</text> <justify>"right"</justify> </label>
+        </hbox>fs
+        <hbox>
+	        <led>
+	            <halpin>"x.error.e4"</halpin>
+	            <size>20</size>
+	            <on_color>"red"</on_color>
+	            <off_color>"black"</off_color>
+	        </led>
+	        <label> <text>"  Over voltage  "</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.error.e5"</halpin>
+	            <size>20</size>
+	            <on_color>"red"</on_color>
+	            <off_color>"black"</off_color>
+	        </led>
+	        <label> <text>"  Under voltage"</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.error.e6"</halpin>
+	            <size>20</size>
+	            <on_color>"red"</on_color>
+	            <off_color>"black"</off_color>
+	        </led>
+	        <label> <text>"  Over current"</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.error.e7"</halpin>
+	            <size>20</size>
+	            <on_color>"red"</on_color>
+	            <off_color>"black"</off_color>
+	        </led>
+	        <label> <text>"  Emergency"</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.error.e8"</halpin>
+	            <size>20</size>
+	            <on_color>"red"</on_color>
+	            <off_color>"black"</off_color>
+	        </led>
+	        <label> <text>"  E8"</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.error.e9"</halpin>
+	            <size>20</size>
+	            <on_color>"red"</on_color>
+	            <off_color>"black"</off_color>
+	        </led>
+	        <label> <text>"  E9"</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.error.e10"</halpin>
+	            <size>20</size>
+	            <on_color>"red"</on_color>
+	            <off_color>"black"</off_color>
+	        </led>
+	        <label> <text>"  E10"</text> <justify>"right"</justify> </label>
+        </hbox>
+        <hbox>
+	        <led>
+	            <halpin>"x.error.e11"</halpin>
+	            <size>20</size>
+	            <on_color>"red"</on_color>
+	            <off_color>"black"</off_color>
+	        </led>
+	        <label> <text>"  E11"</text> <justify>"right"</justify> </label>
+        </hbox>
+    </labelframe>
+</vbox>
+
+</pyvcp>

@@ -1,0 +1,125 @@
+#
+# HAL config file for position pid
+#
+
+# load PID module, for position loops
+loadrt                                  pid num_chan=[TRAJ]AXES
+# X direction must be inverted (scaled to -1)
+loadrt                                  scale count=2
+
+addf pid.0.do-pid-calcs                 servo-thread
+addf pid.1.do-pid-calcs                 servo-thread
+addf pid.2.do-pid-calcs                 servo-thread
+#addf pid.3.do-pid-calcs                 servo-thread
+addf scale.0                            servo-thread
+addf scale.1                            servo-thread
+
+# PID parameters from the ini
+setp pid.0.Pgain                        [AXIS_0]P
+setp pid.0.Igain                        [AXIS_0]I
+setp pid.0.Dgain                        [AXIS_0]D
+setp pid.0.bias                         [AXIS_0]BIAS
+setp pid.0.FF0                          [AXIS_0]FF0
+setp pid.0.FF1                          [AXIS_0]FF1
+setp pid.0.FF2                          [AXIS_0]FF2
+setp pid.0.deadband                     [AXIS_0]DEADBAND
+# PID parameters from the ini
+setp pid.1.Pgain                        [AXIS_1]P
+setp pid.1.Igain                        [AXIS_1]I
+setp pid.1.Dgain                        [AXIS_1]D
+setp pid.1.bias                         [AXIS_1]BIAS
+setp pid.1.FF0                          [AXIS_1]FF0
+setp pid.1.FF1                          [AXIS_1]FF1
+setp pid.1.FF2                          [AXIS_1]FF2
+setp pid.1.deadband                     [AXIS_1]DEADBAND
+# PID parameters from the ini
+setp pid.2.Pgain                        [AXIS_2]P
+setp pid.2.Igain                        [AXIS_2]I
+setp pid.2.Dgain                        [AXIS_2]D
+setp pid.2.bias                         [AXIS_2]BIAS
+setp pid.2.FF0                          [AXIS_2]FF0
+setp pid.2.FF1                          [AXIS_2]FF1
+setp pid.2.FF2                          [AXIS_2]FF2
+setp pid.2.deadband                     [AXIS_2]DEADBAND
+
+# PID parameters from the ini
+#setp pid.3.Pgain                        [AXIS_3]P
+#setp pid.3.Igain                        [AXIS_3]I
+#setp pid.3.Dgain                        [AXIS_3]D
+#setp pid.3.bias                         [AXIS_3]BIAS
+#setp pid.3.FF0                          [AXIS_3]FF0
+#setp pid.3.FF1                          [AXIS_3]FF1
+#setp pid.3.FF2                          [AXIS_3]FF2
+#setp pid.3.deadband                     [AXIS_3]DEADBAND
+
+# X axis needs to be inverted (scaled by -1)
+# Invert position target for X axis to feed PID input 
+setp scale.0.gain			-1.00
+net Xpos-cmd                            <= axis.0.motor-pos-cmd
+net Xpos-cmd                            => scale.0.in
+# invert setpoint to pid for the X axis
+net Xpos-cmd-inv                        <= scale.0.out
+
+# feed target positions from Axis to PIDs
+net Ypos-cmd                            <= axis.1.motor-pos-cmd
+net Zpos-cmd                            <= axis.2.motor-pos-cmd
+#net Apos-cmd                            <= axis.3.motor-pos-cmd
+ 
+# connect position target from Axis to PID input 
+net Xpos-cmd-inv                        => pid.0.command
+net Ypos-cmd                            => pid.1.command
+net Zpos-cmd                            => pid.2.command
+#net Apos-cmd                            => pid.3.command
+
+# connect position feedback from 2FOC to PID 
+net fpositX                             => pid.0.feedback
+net fpositY                             => pid.1.feedback
+net fpositZ                             => pid.2.feedback
+#net fpositA                             => pid.3.feedback
+
+# position is also sent to Axis, first X position has to be inverted (scaled by -1) 
+net fpositX                             => scale.1.in
+setp scale.1.gain                       -1.00
+net fpositX-inv                         <= scale.1.out
+
+net fpositX-inv                         => axis.0.motor-pos-fb
+net fpositY                             => axis.1.motor-pos-fb
+net fpositZ                             => axis.2.motor-pos-fb
+#net fpositA                             => axis.3.motor-pos-fb
+
+# PID output converted to s32 is sent as setpoint to 2FOC
+net PIDoutX                             <= pid.0.output
+net PIDoutY                             <= pid.1.output
+net PIDoutZ                             <= pid.2.output
+#net PIDoutA                             <= pid.3.output
+
+# convert PID output in s32 and send it as setpoint to 2FOC
+loadrt                                  conv_float_s32 count=[TRAJ]AXES
+
+addf                                    conv-float-s32.0 servo-thread
+addf                                    conv-float-s32.1 servo-thread
+addf                                    conv-float-s32.2 servo-thread
+#addf                                    conv-float-s32.3 servo-thread
+
+net PIDoutX                             => conv-float-s32.0.in
+net PIDoutY                             => conv-float-s32.1.in
+net PIDoutZ                             => conv-float-s32.2.in
+#net PIDoutA                             => conv-float-s32.3.in
+
+net s32PIDoutX                          <= conv-float-s32.0.out
+net s32PIDoutY                          <= conv-float-s32.1.out
+net s32PIDoutZ                          <= conv-float-s32.2.out
+#net s32PIDoutA                          <= conv-float-s32.3.out
+
+net s32PIDoutX                          => hal_zed_can.0.setpoint
+net s32PIDoutY                          => hal_zed_can.1.setpoint
+net s32PIDoutZ                          => hal_zed_can.2.setpoint
+#net s32PIDoutA                          => hal_zed_can.3.setpoint
+
+# Axis enables position control
+net PIDenable                           <= axis.0.amp-enable-out
+net PIDenable                           => pid.0.enable
+net PIDenable                           => pid.1.enable
+net PIDenable                           => pid.2.enable
+#net PIDenable                           => pid.3.enable
+

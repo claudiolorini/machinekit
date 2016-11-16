@@ -1,0 +1,19 @@
+#
+#  configurations related to manual tool changer
+#
+
+loadusr -W hal_manualtoolchange
+
+# in case they were linked already
+unlinkp iocontrol.0.tool-change
+unlinkp iocontrol.0.tool-changed
+
+#net tool-change           hal_manualtoolchange.change     iocontrol.0.tool-change 
+#net tool-changed          hal_manualtoolchange.changed    iocontrol.0.tool-changed
+#net tool-prep-number      hal_manualtoolchange.number     iocontrol.0.tool-prep-number
+
+net tool-change           iocontrol.0.tool-change      => hal_manualtoolchange.change
+net tool-changed          iocontrol.0.tool-changed     <= hal_manualtoolchange.changed
+net tool-number           iocontrol.0.tool-prep-number => hal_manualtoolchange.number
+net tool-prepare-loopback iocontrol.0.tool-prepare     => iocontrol.0.tool-prepared
+

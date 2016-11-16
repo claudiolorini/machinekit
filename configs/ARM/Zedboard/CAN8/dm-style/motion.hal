@@ -1,0 +1,13 @@
+#
+# Motion related stuff 
+#
+
+# kinematics - 1:1 correspondence between joints and axes.
+loadrt                                  trivkins
+loadrt                                  tp 
+# motion controller (motmod), parameters defined in dm-style.ini 
+loadrt [MKM]MKMOT base_period_nsec=[MKM]BASE_P servo_period_nsec=[MKM]SERVO_P traj_period_nsec=[MKM]TRAJ_P num_joints=[TRAJ]AXES tp=tp kins=trivkins 
+# hook functions to realtime thread
+addf motion-command-handler             servo-thread
+addf motion-controller                  servo-thread
+

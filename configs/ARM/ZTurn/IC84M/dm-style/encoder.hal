@@ -1,0 +1,53 @@
+#
+# CAN8 IO as encoder for jog movments
+#
+
+#
+# GPIO connections:
+# hal_zed_gpio.pin-00-in emergency button
+#
+# hal_zed_gpio.pin-01-in loop cycle activation of axis
+# hal_zed_gpio.pin-02-in A channel
+# hal_zed_gpio.pin-03-in B channel
+#
+
+# encoder
+loadrt encoder                              num_chan=1
+
+# to select the axis to jog
+loadrt select8                              count=1
+loadrt updown                               count=1
+
+# add functions to threads
+addf encoder.update-counters                servo-thread
+addf encoder.capture-position               servo-thread
+addf updown.0                               servo-thread
+addf select8.0                              servo-thread
+
+# connect inputs to the encoder
+net encA encoder.0.phase-A                  <= hal_zed_gpio.pin-02-in
+net encB encoder.0.phase-B                  <= hal_zed_gpio.pin-03-in
+
+# configure jog                             0.0025 is equal to 0.01mm
+net enc-counts encoder.0.counts             => axis.0.jog-counts axis.1.jog-counts axis.2.jog-counts
+setp axis.0.jog-scale                       0.01
+setp axis.1.jog-scale                       0.01
+setp axis.2.jog-scale                       0.01
+setp axis.0.jog-vel-mode                    0
+setp axis.1.jog-vel-mode                    0
+setp axis.2.jog-vel-mode                    0
+
+# GPIO 1 cycle selected axis 
+net jog-button updown.0.countup             <= hal_zed_gpio.pin-01-in
+net jog-choice updown.0.count               => select8.0.sel
+
+# enable jog
+net jog-x axis.0.jog-enable                 <= select8.0.out0
+net jog-y axis.1.jog-enable                 <= select8.0.out1
+net jog-z axis.2.jog-enable                 <= select8.0.out2
+
+# loop from axis 'min' to axis 'max'
+setp updown.0.max                           2
+setp updown.0.min                           0
+setp updown.0.wrap                          1
+

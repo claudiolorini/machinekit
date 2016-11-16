@@ -1,0 +1,14 @@
+This directory contains an example for a complete 3 axis machine. 
+The motors are closed loop servos driven with 2FOC boards using 
+RTCAN communication. Using a Zedboard with CAN8 interface in point 
+to point CAN configuration is possibile to close the position loop 
+at up to 3KHz frequency.
+
+The following comp files from 'halrun' examples are needed: 
+  posfromencoder.comp
+  u32_bus_to_wires.comp
+
+the configuration includes:
+ - GPIO for E-Stop, Limit switches, jog wheel
+ - rtcan controlled servodrives (CSV - cyclic sync velocity mode)
+ - drivers status/error LEDs with pyvcp

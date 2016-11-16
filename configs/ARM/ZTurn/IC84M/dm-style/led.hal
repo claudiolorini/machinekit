@@ -1,0 +1,37 @@
+# led update thread
+loadrt threads name1=slow-thread period2=100000000 
+
+#load graphics
+loadusr -Wn leds pyvcp -g 180x320+200+50 -c leds led.xml
+
+# provide 32 single bits from a u32
+loadrt u32_bus_to_wires     count=2
+
+# add LEDs update function to the thread
+addf u32-bus-to-wires.0     slow-thread
+addf u32-bus-to-wires.1     slow-thread
+
+# inputs
+net     status              hal_zed_can.0.status        => u32-bus-to-wires.0.in
+net     error               hal_zed_can.0.error         => u32-bus-to-wires.1.in
+
+# 2FOC status LEDs
+net     speed               u32-bus-to-wires.0.out2     => leds.x.status.speed
+net     ra                  u32-bus-to-wires.0.out25    => leds.x.status.ra
+net     switchedon          u32-bus-to-wires.0.out30    => leds.x.status.switchedon
+net     operationenabled    u32-bus-to-wires.0.out31    => leds.x.status.operationenabled
+net     pwmen               u32-bus-to-wires.0.out6     => leds.x.status.shutteddown
+
+# 2FOC error LEDs
+net     e0                  u32-bus-to-wires.1.out0     => leds.x.error.e0
+net     e1                  u32-bus-to-wires.1.out1     => leds.x.error.e1
+net     e2                  u32-bus-to-wires.1.out2     => leds.x.error.e2
+net     e4                  u32-bus-to-wires.1.out4     => leds.x.error.e4
+net     e5                  u32-bus-to-wires.1.out5     => leds.x.error.e5
+net     e6                  u32-bus-to-wires.1.out6     => leds.x.error.e6
+net     e7                  u32-bus-to-wires.1.out7     => leds.x.error.e7
+net     e8                  u32-bus-to-wires.1.out8     => leds.x.error.e8
+net     e9                  u32-bus-to-wires.1.out9     => leds.x.error.e9
+net     e10                 u32-bus-to-wires.1.out10    => leds.x.error.e10
+net     e11                 u32-bus-to-wires.1.out11    => leds.x.error.e11
+

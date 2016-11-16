@@ -1314,9 +1314,16 @@ endif
 
 ifdef TARGET_PLATFORM_ZEDBOARD
 obj-$(CONFIG_HAL_GPIO) += hal_zed_gpio.o
-hal_zed_gpio-objs := hal/drivers/hal_zed_gpio.o
+hal_zed_gpio-objs := hal/drivers/zedboard/hal_zed_gpio.o
 obj-$(CONFIG_HAL_CAN) += hal_zed_can.o
-hal_zed_can-objs := hal/drivers/hal_zed_can.o
+hal_zed_can-objs := hal/drivers/zedboard/hal_zed_can.o
+endif
+
+ifdef TARGET_PLATFORM_ZTURN
+obj-$(CONFIG_HAL_GPIO) += hal_zturn_gpio.o
+hal_zturn_gpio-objs := hal/drivers/zturn/hal_zturn_gpio.o
+obj-$(CONFIG_HAL_CAN) += hal_zturn_can.o
+hal_zturn_can-objs := hal/drivers/zturn/hal_zturn_can.o
 endif
 
 # hal_pru_generic driver
@@ -1738,6 +1745,11 @@ endif
 ifdef TARGET_PLATFORM_ZEDBOARD
 $(RTLIBDIR)/hal_zed_gpio$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(hal_zed_gpio-objs))
 $(RTLIBDIR)/hal_zed_can$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(hal_zed_can-objs))
+endif
+
+ifdef TARGET_PLATFORM_ZTURN
+$(RTLIBDIR)/hal_zturn_gpio$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(hal_zturn_gpio-objs))
+$(RTLIBDIR)/hal_zturn_can$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(hal_zturn_can-objs))
 endif
 
 $(RTLIBDIR)/pci_8255$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(pci_8255-objs))

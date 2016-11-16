@@ -1,0 +1,107 @@
+#
+# HAL config file to simulate limit switches using window comparators
+#
+
+# install window comparators for limits and home
+loadrt wcomp count=18 # names=wc_xmin,wc_xmax,wc_ymin,wc_ymax,wc_amin,wc_amax,wc_umin,wc_umax,wc_vmin,wc_vmax,wc_bmin,wc_bmax
+
+# add comparators to servo thread to be evaluated every servo period
+# X
+addf    wcomp.0     servo-thread # wc_xmin
+addf    wcomp.1     servo-thread # wc_xmax
+# Y
+addf    wcomp.2     servo-thread # wc_ymin
+addf    wcomp.3     servo-thread # wc_ymax
+# A
+addf    wcomp.4     servo-thread # wc_amin
+addf    wcomp.5     servo-thread # wc_amax
+
+# U
+addf    wcomp.6     servo-thread # wc_umin
+addf    wcomp.7     servo-thread # wc_umax
+# V
+addf    wcomp.8     servo-thread # wc_vmin
+addf    wcomp.9     servo-thread # wc_vmax
+# B
+addf    wcomp.10    servo-thread # wc_bmin
+addf    wcomp.11    servo-thread # wc_bmax
+
+# connect position feedback to window comparators
+# X
+net     Xpos =>     wcomp.0.in
+net     Xpos =>     wcomp.1.in
+# Y
+net     Ypos =>     wcomp.2.in
+net     Ypos =>     wcomp.3.in
+# A
+net     Apos =>     wcomp.4.in
+net     Apos =>     wcomp.5.in
+# U
+net     Upos =>     wcomp.6.in
+net     Upos =>     wcomp.7.in
+# V
+net     Vpos =>     wcomp.8.in
+net     Vpos =>     wcomp.9.in
+# B
+net     Bpos =>     wcomp.10.in
+net     Bpos =>     wcomp.11.in
+
+# connect simulated switch outputs to motion controller
+# X
+net Xminlim wcomp.0.out  => axis.0.neg-lim-sw-in
+net Xmaxlim wcomp.1.out  => axis.0.pos-lim-sw-in
+# Y
+net Yminlim wcomp.2.out  => axis.1.neg-lim-sw-in
+net Ymaxlim wcomp.3.out  => axis.1.pos-lim-sw-in
+# A
+net Aminlim wcomp.4.out  => axis.3.neg-lim-sw-in
+net Amaxlim wcomp.5.out  => axis.3.pos-lim-sw-in
+# U
+net Uminlim wcomp.6.out  => axis.6.neg-lim-sw-in
+net Umaxlim wcomp.7.out  => axis.6.pos-lim-sw-in
+# V
+net Vminlim wcomp.8.out  => axis.7.neg-lim-sw-in
+net Vmaxlim wcomp.9.out  => axis.7.pos-lim-sw-in
+# B
+net Bminlim wcomp.10.out => axis.4.neg-lim-sw-in
+net Bmaxlim wcomp.11.out => axis.4.pos-lim-sw-in
+
+# configure the points at which the simulated switches trip
+# X lower limit
+setp    wcomp.0.max     -100
+setp    wcomp.0.min     -110
+# X upper limit
+setp    wcomp.1.min     2100
+setp    wcomp.1.max     2110
+# Y lower limit
+setp    wcomp.2.max     -600
+setp    wcomp.2.min     -610
+# Y upper limit
+setp    wcomp.3.min     600
+setp    wcomp.3.max     610
+# A lower limit
+setp    wcomp.4.max     1000000
+setp    wcomp.4.min     1000100
+# A upper limit
+setp    wcomp.5.min     -1000000
+setp    wcomp.5.max     -1000100
+
+# U lower limit
+setp    wcomp.6.max     -100
+setp    wcomp.6.min     -110
+# U upper limit
+setp    wcomp.7.min     2100
+setp    wcomp.7.max     2110
+# V lower limit
+setp    wcomp.8.max     -600
+setp    wcomp.8.min     -610
+# V upper limit
+setp    wcomp.9.min     600
+setp    wcomp.9.max     610
+# B lower limit
+setp    wcomp.10.max    1000000
+setp    wcomp.10.min    1000100
+# B upper limit
+setp    wcomp.11.min    -1000000
+setp    wcomp.11.max    -1000100
+

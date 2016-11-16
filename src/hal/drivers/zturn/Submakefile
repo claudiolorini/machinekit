@@ -1,0 +1,28 @@
+#
+# (sub)Makefile for the compilation of Z-Turn related stuff
+# 
+
+# in order to locate the proper xenomai includes and libraries:
+RTDM_FLAGS = -I/usr/include/xenomai/ -D_GNU_SOURCE -D_REENTRANT -D__XENO__ # -I/usr/xenomai/include/posix
+LD_RTDM_FLAGS = -Wl,@/usr/xenomai/lib/posix.wrappers -L/usr/xenomai/lib -lpthread_rt -lxenomai -lpthread -lrt -lrtdm -lxenomai -lpthread -lrt
+
+ifdef TARGET_PLATFORM_ZTURN
+  obj-$(CONFIG_HAL_ZTURN_GPIO) += hal_zturn_gpio.o
+  hal_zturn_gpio-objs := hal/drivers/zturn/hal_zturn_gpio.o
+
+#
+# \todo: conditional building related to 'with-xenomai' build
+#
+  obj-$(CONFIG_HAL_ZTURN_CAN) += hal_zturn_can.o
+  hal_zturn_can-objs := hal/drivers/zturn/hal_zturn_can.o
+
+  ifeq ($(BUILD_THREAD_FLAVORS),'xenomai')  
+    echo " ---------> Yeah Xenomai ";\
+  else
+    echo " ---------> Noooo Xenomai "
+  endif
+
+endif
+
+
+

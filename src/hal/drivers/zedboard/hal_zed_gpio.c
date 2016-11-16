@@ -42,6 +42,8 @@
  \version 02
  \date  20.03.2015 Moved to a true rt implementation
  \version 03
+ \date  31.01.2016 Inputs extended to 14
+ \version 04
 
  \note
  \bug
@@ -196,7 +198,7 @@ hal_bit_t **oport_data;
 hal_bit_t **iport_data;
 
 // number of available gp in
-static int ngpi = 7;
+static int ngpi = 14;
 // number of available gp out
 static int ngpo = 8;
 
@@ -310,11 +312,11 @@ int rtapi_app_main(void)
     // zynq and FPGA code revision
     int rev, zrev;
     // save messaging level 
-    static int msg_level;
     int n, retval = 0;
+    // static int msg_level;
     
     // save message level on entering 
-    msg_level = rtapi_get_msg_level();
+    // msg_level = rtapi_get_msg_level();
     
     /* force messaging level in:
     RTAPI_MSG_NONE,
@@ -340,7 +342,7 @@ int rtapi_app_main(void)
     switch (rev) {
         case 01:
             rtapi_print_msg(RTAPI_MSG_INFO, "HAL_ZED_GPIO: Zedboard FPGA Revision 01\n");
-            ngpi = 7;
+            ngpi = 14;
             ngpo = 8;
         break;
 

@@ -1,0 +1,76 @@
+component u32_bus_to_wires "Provide single bit values from a u32";
+pin in u32 in_;
+
+pin out bit out0;
+pin out bit out1;
+pin out bit out2;
+pin out bit out3;
+pin out bit out4;
+pin out bit out5;
+pin out bit out6;
+pin out bit out7;
+pin out bit out8;
+pin out bit out9;
+pin out bit out10;
+pin out bit out11;
+pin out bit out12;
+pin out bit out13;
+pin out bit out14;
+pin out bit out15;
+pin out bit out16;
+pin out bit out17;
+pin out bit out18;
+pin out bit out19;
+pin out bit out20;
+pin out bit out21;
+pin out bit out22;
+pin out bit out23;
+pin out bit out24;
+pin out bit out25;
+pin out bit out26;
+pin out bit out27;
+pin out bit out28;
+pin out bit out29;
+pin out bit out30;
+pin out bit out31;
+
+function _ nofp "Update 'outs' based on 'in'";
+license "GPL";
+
+;;
+FUNCTION(_) {
+    hal_u32_t in = in_;
+
+    out0  = (in & 0x00000001)>>0; 
+    out1  = (in & 0x00000002)>>1; 
+    out2  = (in & 0x00000004)>>2; 
+    out3  = (in & 0x00000008)>>3; 
+    out4  = (in & 0x00000010)>>4; 
+    out5  = (in & 0x00000020)>>5; 
+    out6  = (in & 0x00000040)>>6; 
+    out7  = (in & 0x00000080)>>7; 
+    out8  = (in & 0x00000100)>>8; 
+    out9  = (in & 0x00000200)>>9; 
+    out10 = (in & 0x00000400)>>10; 
+    out11 = (in & 0x00000800)>>11; 
+    out12 = (in & 0x00001000)>>12; 
+    out13 = (in & 0x00002000)>>13; 
+    out14 = (in & 0x00004000)>>14; 
+    out15 = (in & 0x00008000)>>15; 
+    out16 = (in & 0x00010000)>>16; 
+    out17 = (in & 0x00020000)>>17; 
+    out18 = (in & 0x00040000)>>18; 
+    out19 = (in & 0x00080000)>>19; 
+    out20 = (in & 0x00100000)>>20; 
+    out21 = (in & 0x00200000)>>21; 
+    out22 = (in & 0x00400000)>>22; 
+    out23 = (in & 0x00800000)>>23; 
+    out24 = (in & 0x01000000)>>24; 
+    out25 = (in & 0x02000000)>>25; 
+    out26 = (in & 0x04000000)>>26; 
+    out27 = (in & 0x08000000)>>27; 
+    out28 = (in & 0x10000000)>>28; 
+    out29 = (in & 0x20000000)>>29; 
+    out30 = (in & 0x40000000)>>30; 
+    out31 = (in & 0x80000000)>>31; 
+}

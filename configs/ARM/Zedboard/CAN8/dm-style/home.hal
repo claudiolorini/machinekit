@@ -1,0 +1,11 @@
+# X home switch hal_zed_gpio.pin-08-in
+net XhomeSW         <= hal_zed_gpio.pin-08-in
+net XhomeSW         => axis.0.home-sw-in
+
+# Y home switch hal_zed_gpio.pin-10-in
+net YhomeSW         <= hal_zed_gpio.pin-10-in
+net YhomeSW         => axis.1.home-sw-in
+
+# Z home switch hal_zed_gpio.pin-11-in
+net ZhomeSW         <= hal_zed_gpio.pin-11-in
+net ZhomeSW         => axis.2.home-sw-in

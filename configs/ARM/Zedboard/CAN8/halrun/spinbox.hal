@@ -1,0 +1,2 @@
+loadusr -Wn spinbox pyvcp -c spinbox spinbox.xml
+

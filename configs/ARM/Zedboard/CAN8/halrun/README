@@ -1,0 +1,5 @@
+This directory contains an example of usage of RT-CAN Bus driver on the Zedboard using halrun.
+  zrtcan:  sinusiodal move of 2FOC axis (posfromencoder.comp is needed).
+  spinbox: load a spinbox using pyvcp.
+  led:     show 2FOC status with LEDs using pyvcp (u32_bus_to_wires.comp is needed).
+

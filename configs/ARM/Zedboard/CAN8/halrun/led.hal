@@ -1,0 +1,17 @@
+loadusr -Wn leds pyvcp -g 320x180+200+50 -c leds led.xml
+
+# provide 32 single bits from a u32
+loadrt u32_bus_to_wires
+
+# add LEDs update function to the thread
+addf u32-bus-to-wires.0     slow-thread
+
+# inputs
+net     status              hal_zed_can.0.status        => u32-bus-to-wires.0.in
+# 2FOC status LEDs
+net     speed               u32-bus-to-wires.0.out2     => leds.x.status.speed
+net     ra                  u32-bus-to-wires.0.out25    => leds.x.status.ra
+net     switchedon          u32-bus-to-wires.0.out30    => leds.x.status.switchedon
+net     operationenabled    u32-bus-to-wires.0.out31    => leds.x.status.operationenabled
+net     pwmen               u32-bus-to-wires.0.out6     => leds.x.status.shutteddown
+

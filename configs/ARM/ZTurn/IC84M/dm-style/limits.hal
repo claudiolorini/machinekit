@@ -1,0 +1,8 @@
+
+addf not.2                              servo-thread
+
+# Y limit positive and negative switches (in series)
+net nYMinMaxlim      <= hal_zed_gpio.pin-09-in
+net nYMinMaxlim      => not.2.in
+net YMinMaxlim       <= not.2.out
+net YMinMaxlim       => axis.1.neg-lim-sw-in axis.1.pos-lim-sw-in
