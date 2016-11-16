@@ -1,5 +1,6 @@
 #
 # Test ZTurn IO as encoder for jog movments
+# button select the active axis and turn on led signaling 
 #
 
 # 1:1 correspondence between joints and axes.
@@ -16,6 +17,9 @@ loadrt [EMCMOT]EMCMOT base_period_nsec=[EMCMOT]BASE_PERIOD servo_period_nsec=[EM
 # hal_zturn_gpio.pin-01-in B channel
 # hal_zturn_gpio.pin-02-in loop cycle activation of axis
 # hal_zturn_gpio.pin-03-in emergency button
+#
+# hal_zturn_gpio.pin-01-out X axis active 
+# hal_zturn_gpio.pin-02-out Y axis active 
 #
 
 # loadrt hal_zturn_gpio module
@@ -67,9 +71,11 @@ setp axis.1.jog-vel-mode                    0
 net jog-button updown.0.countup             <= hal_zturn_gpio.pin-02-in
 net jog-choice updown.0.count               => select8.0.sel
 
-# enable jog
+# enable jog and led 
 net jog-x axis.0.jog-enable                 <= select8.0.out0
+net jog-x                              => hal_zturn_gpio.pin-01-out         
 net jog-y axis.1.jog-enable                 <= select8.0.out1
+net jog-y                              => hal_zturn_gpio.pin-02-out         
 
 # loop from axis 'min' to axis 'max'
 setp updown.0.max                           1
