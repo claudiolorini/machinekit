@@ -1,0 +1,16 @@
+# 
+# HAL FILE FOR 3D SIMULATION OF DYDE STRUCTURE 
+# 
+
+loadusr -W ./testgui
+
+net j0 axis.0.joint-pos-fb testgui.joint0
+net j1 axis.1.joint-pos-fb testgui.joint1
+net j2 axis.2.joint-pos-fb testgui.joint2
+net j3 axis.3.joint-pos-fb testgui.joint3
+net j4 axis.4.joint-pos-fb testgui.joint4
+net j5 axis.5.joint-pos-fb testgui.joint5
+net j6 axis.6.joint-pos-fb testgui.joint6
+net j7 axis.7.joint-pos-fb testgui.joint7
+net j8 axis.8.joint-pos-fb testgui.joint8
+

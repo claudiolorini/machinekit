@@ -1,0 +1,2 @@
+# loadusr -W pyvcp -c pyvcp led.xml
+loadusr -Wn leds pyvcp -g 320x180+200+50 -c leds led.xml
