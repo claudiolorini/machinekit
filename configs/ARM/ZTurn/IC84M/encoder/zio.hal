@@ -34,7 +34,7 @@ loadrt updown                               count=1
 # add functions to threads
 addf motion-command-handler                 servo-thread
 addf motion-controller                      servo-thread
-# addf hal_zturn_gpio.write                 servo-thread
+addf hal_zturn_gpio.write                   servo-thread
 addf hal_zturn_gpio.read                    servo-thread
 addf not.0                                  servo-thread
 addf encoder.update-counters                servo-thread

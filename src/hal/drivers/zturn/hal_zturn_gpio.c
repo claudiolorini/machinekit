@@ -46,7 +46,7 @@ PMODB1   connected to EMIO52
 ...
 PMODB5   connected to EMIO56
 
-IC84M connectors: 
+IC84M connectors:
 I1..3     J3
 I4..6     J4
 I7..8     J5
@@ -101,14 +101,14 @@ hal_bit_t **iport_data;
 // number of available isogpin
 #define  NGPI 12
 // number of available isogpout
-#define  NGPO  0
+#define  NGPO  6
 
 // pointer to start of GPIO pheriferal registers
 void *base;
 // pointers to access GPIO registers
 unsigned *RDATA_2_RO;
 unsigned *RDATA_3_RO;
-
+unsigned *RDATA_3;
 
 // file descriptor for mem access
 int fd;
@@ -118,20 +118,16 @@ int fd;
  \pre ngpio and base must be initialized */
 static void write_port(void *arg, long period)
 {
-    int n;
-    unsigned *RDATA_2 = base + DATA_2;
+    static int n=0;
 
-    // *((unsigned *)(base + DATA_2)) = 6;
+// \todo can be optimized using the RMASK_DATA_3_LSW instead of DATA_3
 
-// \todo can be optimized using the RMASK_DATA_3_LSW instead of
-
-    // J8 Outputs from 71 to 78 are on DATA_2 reg.
     for (n = 0; n < NGPO; n++) {
-        if (0 == *(oport_data[n])) { 
-            RTAPI_BIT_CLEAR(RDATA_2, n+17);
+        if (0 == *(oport_data[n])) {
+            RTAPI_BIT_CLEAR(RDATA_3, n+8);
         }
         else {
-            RTAPI_BIT_SET(RDATA_2, n+17);
+            RTAPI_BIT_SET(RDATA_3, n+8);
         }
     }
 }
@@ -179,16 +175,8 @@ static void setup_gpio_access()
 
     // set GPO1..GPO6 as outputs
     *RDIRM_3 = *RDIRM_3 | 0x00003F00;
-
-    // \todo setup PMODs as I or O according to needs 
-    // set PMODA1..PMODA5 as inputs
-    *RDIRM_3 = *RDIRM_3 & 0xFFF83FFF;
-    // set PMODB1..PMODB5 as inputs
-    *RDIRM_3 = *RDIRM_3 & 0xFF07FFFF;
- 
     // enable output drivers
     *ROEN_3  = *ROEN_3  | 0x00003F00;
-
     // init outputs to 0  
     // \note MASK_DATA_2_LSW ca be used to avoid Read Modify Write
     // operation when writing specific output bits
@@ -196,7 +184,14 @@ static void setup_gpio_access()
     //  0: pin value is updated
     //  1: pin is masked 
     // MASK_DATA_x_ySW[15..0] contains the data to be written
-    *RMASK_DATA_3_LSW = *RMASK_DATA_3_LSW & 0xC0FF0000;
+    *RMASK_DATA_3_LSW = *RMASK_DATA_3_LSW & 0xC0FF3F00;
+
+    // \todo setup PMODs as I or O according to needs 
+    // set PMODA1..PMODA5 as inputs
+    *RDIRM_3 = *RDIRM_3 & 0xFFF83FFF;
+    // set PMODB1..PMODB5 as inputs
+    *RDIRM_3 = *RDIRM_3 & 0xFF07FFFF;
+
 }
 
 /**
@@ -315,7 +310,8 @@ int rtapi_app_main(void)
     // init pointers to access GPIO registers
     RDATA_2_RO = base + DATA_2_RO;
     RDATA_3_RO = base + DATA_3_RO;
-
+    RDATA_3    = base + DATA_3;
+ 
     // allocate space for IO port data
     iport_data = hal_malloc(NGPI * sizeof(void *));
     oport_data = hal_malloc(NGPO * sizeof(void *));
