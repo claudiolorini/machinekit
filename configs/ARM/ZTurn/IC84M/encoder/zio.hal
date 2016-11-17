@@ -73,9 +73,9 @@ net jog-choice updown.0.count               => select8.0.sel
 
 # enable jog and led 
 net jog-x axis.0.jog-enable                 <= select8.0.out0
-net jog-x                                   => hal_zturn_gpio.pin-01-out         
+net jog-x                                   => hal_zturn_gpio.pin-06-out         
 net jog-y axis.1.jog-enable                 <= select8.0.out1
-net jog-y                                   => hal_zturn_gpio.pin-02-out         
+net jog-y                                   => hal_zturn_gpio.pin-07-out         
 
 # loop from axis 'min' to axis 'max'
 setp updown.0.max                           1
