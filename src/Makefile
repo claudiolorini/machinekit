@@ -202,7 +202,6 @@ SUBDIRS := \
 	machinetalk/msgcomponents \
 	machinetalk/lib \
 	machinetalk/config-service \
-	machinetalk/webtalk \
 	machinetalk/haltalk \
 	machinetalk/mkwrapper \
 	machinetalk/mklauncher \
@@ -245,6 +244,7 @@ SUBDIRS := \
 	hal/drivers/hal_pru_generic \
 	hal/simdrivers \
 	hal/cython \
+	hal/accessor \
 	\
 	emc/usr_intf/axis \
 	emc/usr_intf/touchy \
@@ -271,6 +271,10 @@ SUBDIRS := \
 
 ifeq ($(HAVE_KERNEL_THREADS),yes)
 SUBDIRS += module_helper
+endif
+
+ifeq ($(BUILD_WEBTALK),yes)
+SUBDIRS += machinetalk/webtalk
 endif
 
 # moved to src/rtapi/Submakefile
@@ -385,10 +389,23 @@ CFLAGS := $(INCLUDE) $(OPT) $(DEBUG) $(PROFILE_CFLAGS) -DULAPI $(call cc-option,
 # enable runtime comparison of GIT_CONFIG_SHA (config.h) and GIT_BUILD_SHA
 CFLAGS += -DGIT_BUILD_SHA=\"'$(GIT_BUILD_SHA)'\"
 
-CXXFLAGS := $(INCLUDE) $(CXXFLAGS) \
-	 -DULAPI $(DEBUG) $(OPT) \
-	$(PROFILE_CFLAGS) \
-	 -DGIT_BUILD_SHA=\"'$(GIT_BUILD_SHA)'\"
+# make ck_pr.h happy:
+CFLAGS += $(CK_CFLAGS)
+
+# if not initialised use innocuous switch to prevent errors
+ifeq ($(ARCH_CFLAGS),@ARCH_CFLAGS@)
+ARCH_CFLAGS := -Wunused
+endif
+
+BASE_CXXFLAGS:= $(INCLUDE) $(CXXFLAGS) \
+		$(CK_CFLAGS) \
+		$(DEBUG) $(OPT) \
+		$(PROFILE_CFLAGS) \
+		 -DGIT_BUILD_SHA=\"'$(GIT_BUILD_SHA)'\" \
+		$(ARCH_CFLAGS)
+
+CXXFLAGS :=   $(BASE_CXXFLAGS) -DULAPI
+RT_CXXFLAGS :=   $(BASE_CXXFLAGS) 
 
 ifeq ($(RUN_IN_PLACE),yes)
 LDFLAGS += -L$(LIB_DIR) -Wl,-rpath,$(LIB_DIR)
@@ -513,17 +530,23 @@ HEADERS := \
     emc/rs274ngc/interp_base.hh \
     emc/rs274ngc/modal_state.hh \
     emc/rs274ngc/rs274ngc.hh \
+    hal/lib/hal_accessor.h \
+    hal/lib/hal_accessor_macros.h \
     hal/lib/config_module.h \
     hal/lib/hal_group.h \
     hal/lib/hal.h \
+    hal/lib/hal_iring.h \
     hal/lib/hal_internal.h \
     hal/lib/hal_iter.h \
     hal/lib/hal_list.h \
     hal/lib/hal_logging.h \
+    hal/lib/hal_object.h \
+    hal/lib/hal_object_selectors.h \
     hal/lib/hal_parport.h \
     hal/lib/hal_priv.h \
     hal/lib/hal_rcomp.h \
     hal/lib/hal_ring.h \
+    hal/lib/hal_types.h \
     hal/lib/vtable.h \
     hal/drivers/hal_spi.h \
     libnml/buffer/locmem.hh \
@@ -572,13 +595,59 @@ HEADERS := \
     libnml/rcs/rcs_exit.hh \
     libnml/rcs/rcs_print.hh \
     libnml/rcs/rcsversion.h \
+    machinetalk/build/machinetalk/protobuf/message.pb.h \
+    machinetalk/build/machinetalk/protobuf/types.pb.h \
+    machinetalk/build/machinetalk/protobuf/canon.npb.h \
+    machinetalk/build/machinetalk/protobuf/config.pb.h \
+    machinetalk/build/machinetalk/protobuf/firmware.npb.h \
+    machinetalk/build/machinetalk/protobuf/jplan.pb.h \
+    machinetalk/build/machinetalk/protobuf/message.npb.h \
+    machinetalk/build/machinetalk/protobuf/motcmds.pb.h \
+    machinetalk/build/machinetalk/protobuf/object.npb.h \
+    machinetalk/build/machinetalk/protobuf/preview.pb.h \
+    machinetalk/build/machinetalk/protobuf/rtapicommand.npb.h \
+    machinetalk/build/machinetalk/protobuf/rtapi_message.pb.h \
+    machinetalk/build/machinetalk/protobuf/task.npb.h \
+    machinetalk/build/machinetalk/protobuf/test.pb.h \
+    machinetalk/build/machinetalk/protobuf/value.npb.h \
+    machinetalk/build/machinetalk/protobuf/canon.pb.h \
+    machinetalk/build/machinetalk/protobuf/emcclass.npb.h \
+    machinetalk/build/machinetalk/protobuf/firmware.pb.h \
+    machinetalk/build/machinetalk/protobuf/log.npb.h \
+    machinetalk/build/machinetalk/protobuf/nanopb.npb.h \
+    machinetalk/build/machinetalk/protobuf/object.pb.h \
+    machinetalk/build/machinetalk/protobuf/ros.npb.h \
+    machinetalk/build/machinetalk/protobuf/rtapicommand.pb.h \
+    machinetalk/build/machinetalk/protobuf/status.npb.h \
+    machinetalk/build/machinetalk/protobuf/task.pb.h \
+    machinetalk/build/machinetalk/protobuf/types.npb.h \
+    machinetalk/build/machinetalk/protobuf/value.pb.h \
+    machinetalk/build/machinetalk/protobuf/config.npb.h \
+    machinetalk/build/machinetalk/protobuf/emcclass.pb.h \
+    machinetalk/build/machinetalk/protobuf/jplan.npb.h \
+    machinetalk/build/machinetalk/protobuf/log.pb.h \
+    machinetalk/build/machinetalk/protobuf/motcmds.npb.h \
+    machinetalk/build/machinetalk/protobuf/nanopb.pb.h \
+    machinetalk/build/machinetalk/protobuf/preview.npb.h \
+    machinetalk/build/machinetalk/protobuf/ros.pb.h \
+    machinetalk/build/machinetalk/protobuf/rtapi_message.npb.h \
+    machinetalk/build/machinetalk/protobuf/status.pb.h \
+    machinetalk/build/machinetalk/protobuf/test.npb.h \
+    machinetalk/nanopb/pb.h \
+    machinetalk/nanopb/pb_common.h \
+    machinetalk/nanopb/pb_encode.h \
+    machinetalk/nanopb/pb_decode.h \
+    rtapi/multiframe_flag.h \
     rtapi/rtapi.h \
     rtapi/rtapi_app.h \
+    rtapi/rtapi_atomics.h \
     rtapi/rtapi_bitops.h \
     rtapi/rtapi_byteorder.h \
     rtapi/rtapi_export.h \
     rtapi/rtapi_compat.h \
+    rtapi/rtapi_hexdump.h \
     rtapi/rtapi_int.h \
+    rtapi/rtapi_kdetect.h \
     rtapi/rtapi_limits.h \
     rtapi/rtapi_math.h \
     rtapi/rtapi_math64.h \
@@ -591,21 +660,30 @@ HEADERS := \
     rtapi/rtapi_errno.h \
     rtapi/rtapi_string.h \
     rtapi/rtapi_pci.h \
+    rtapi/rtapi_proc.h \
     rtapi/rtapi_heap.h \
     rtapi/rtapi_heap_private.h \
     rtapi/ring.h \
+    rtapi/triple-buffer.h \
     rtapi/multiframe.h \
     rtapi/rtapi_mbarrier.h \
     rtapi/$(THREADS_SOURCE).h \
     rtapi/shmdrv/shmdrv.h
 
-# Make each include file a target
-TARGETS += $(patsubst %,../include/%,$(foreach h,$(HEADERS),$(notdir $h)))
+
+    
+## the "headers" target installs all the header files in ../include
+.PHONY: headers
+HEADERS := $(patsubst %,../include/%,$(foreach h,$(HEADERS),$(notdir $h)))
+headers: $(HEADERS)
+
+# install header files as part of the build
+TARGETS += headers
 
 # Add headers to this list that need to go into subdirectories; their
 # respective Submakefiles will need to provide rules to copy them into
 # ../install.
-TARGETS += $(SUBDIRECTORY_HEADERS)
+headers: $(SUBDIRECTORY_HEADERS)
 
 # Add converting of %.po files
 TARGETS += $(patsubst po/%.po, ../share/locale/%/LC_MESSAGES/linuxcnc.mo, $(wildcard po/*.po))
@@ -949,9 +1027,11 @@ install-python: install-dirs
 	$(DIR) $(DESTDIR)$(SITEPY)/gladevcp
 	$(DIR) $(DESTDIR)$(SITEPY)/stepconf
 	$(DIR) $(DESTDIR)$(SITEPY)/machinekit
+	$(DIR) $(DESTDIR)$(SITEPY)/machinekit/nosetests
 	$(DIR) $(DESTDIR)$(SITEPY)/machinetalk
 	$(DIR) $(DESTDIR)$(SITEPY)/machinetalk/protobuf
 	$(DIR) $(DESTDIR)$(SITEPY)/fdm
+	$(DIR) $(DESTDIR)$(SITEPY)/fdm/config
 	$(DIR) $(DESTDIR)$(datadir)/fdm/thermistor_tables
 	$(DIR) $(DESTDIR)$(SITEPY)/drivers
 	$(FILE) ../lib/python/*.py ../lib/python/*.so $(DESTDIR)$(SITEPY)
@@ -963,10 +1043,12 @@ install-python: install-dirs
 	$(FILE) ../lib/python/gladevcp/*.glade $(DESTDIR)$(SITEPY)/gladevcp
 	$(FILE) ../lib/python/stepconf/*.py $(DESTDIR)$(SITEPY)/stepconf
 	$(FILE) ../lib/python/machinekit/*.py $(DESTDIR)$(SITEPY)/machinekit/
+	$(FILE) ../lib/python/machinekit/nosetests/*.py $(DESTDIR)$(SITEPY)/machinekit/nosetests
 	$(FILE) ../lib/python/machinekit/*.so $(DESTDIR)$(SITEPY)/machinekit/
 	$(FILE) ../lib/python/machinetalk/*.py $(DESTDIR)$(SITEPY)/machinetalk/
 	$(FILE) ../lib/python/machinetalk/protobuf/*.py $(DESTDIR)$(SITEPY)/machinetalk/protobuf/
 	$(FILE) ../lib/python/fdm/*.py $(DESTDIR)$(SITEPY)/fdm
+	$(FILE) ../lib/python/fdm/config/*.py $(DESTDIR)$(SITEPY)/fdm/config
 	$(FILE) ../lib/python/drivers/*.py $(DESTDIR)$(SITEPY)/drivers
 	$(EXE) ../bin/stepconf $(DESTDIR)$(bindir)
 	$(EXE) ../bin/pncconf $(DESTDIR)$(bindir)
@@ -1135,6 +1217,7 @@ endif # KERNELRELEASE non-empty
 # what kbuild seems to require
 
 EXTRA_CFLAGS = $(RTFLAGS) \
+        $(ARCH_CFLAGS) \
 	-D__MODULE__ \
 	-I$(INCLUDE_PREFIX) \
 	-I$(INCLUDE_PREFIX)/libnml/linklist \
@@ -1212,16 +1295,24 @@ endif
 # Subdirectory: rtapi/examples (unneeded?)
 
 # Subdirectory: hal/components
-obj-$(CONFIG_BOSS_PLC) += boss_plc.o
-boss_plc-objs := hal/components/boss_plc.o $(MATHSTUB)
+#obj-$(CONFIG_BOSS_PLC) += boss_plc.o
+#boss_plc-objs := hal/components/boss_plc.o $(MATHSTUB)
 obj-$(CONFIG_ENCODER) += encoder.o
 encoder-objs := hal/components/encoder.o $(MATHSTUB)
+
+obj-$(CONFIG_ENCODER) += encoderv2.o
+encoderv2-objs := hal/components/encoderv2.o $(MATHSTUB)
+
 obj-$(CONFIG_COUNTER) += counter.o
 counter-objs := hal/components/counter.o $(MATHSTUB)
 obj-$(CONFIG_ENCODER_RATIO) += encoder_ratio.o
 encoder_ratio-objs := hal/components/encoder_ratio.o $(MATHSTUB)
+obj-$(CONFIG_ENCODER_RATIO) += encoder_ratiov2.o
+encoder_ratiov2-objs := hal/components/encoder_ratiov2.o $(MATHSTUB)
 obj-$(CONFIG_STEPGEN) += stepgen.o
 stepgen-objs := hal/components/stepgen.o $(MATHSTUB)
+obj-$(CONFIG_STEPGEN) += stepgenv2.o
+stepgenv2-objs := hal/components/stepgenv2.o $(MATHSTUB)
 obj-$(CONFIG_LCD) += lcd.o
 lcd-objs := hal/components/lcd.o $(MATHSTUB)
 obj-$(CONFIG_MATRIX_KB) += matrix_kb.o
@@ -1230,18 +1321,20 @@ obj-$(CONFIG_MUX_GENERIC) += mux_generic.o
 mux_generic-objs := hal/components/mux_generic.o $(MATHSTUB)
 obj-$(CONFIG_PWMGEN) += pwmgen.o
 pwmgen-objs := hal/components/pwmgen.o $(MATHSTUB)
+obj-$(CONFIG_PWMGEN) += pwmgenv2.o
+pwmgenv2-objs := hal/components/pwmgenv2.o $(MATHSTUB)
 obj-$(CONFIG_SIGGEN) += siggen.o
 siggen-objs := hal/components/siggen.o $(MATHSTUB)
 obj-$(CONFIG_PID) += threads.o
 threads-objs := hal/components/threads.o $(MATHSTUB)
-obj-$(CONFIG_SUPPLY) += supply.o
-supply-objs := hal/components/supply.o $(MATHSTUB)
+#obj-$(CONFIG_SUPPLY) += supply.o
+#supply-objs := hal/components/supply.o $(MATHSTUB)
 obj-$(CONFIG_SIM_ENCODER) += sim_encoder.o
 sim_encoder-objs := hal/components/sim_encoder.o $(MATHSTUB)
-obj-$(CONFIG_WATCHDOG) += watchdog.o
-watchdog-objs := hal/components/watchdog.o $(MATHSTUB)
-obj-$(CONFIG_MODMATH) += modmath.o
-modmath-objs := hal/components/modmath.o $(MATHSTUB)
+#obj-$(CONFIG_WATCHDOG) += watchdog.o
+#watchdog-objs := hal/components/watchdog.o $(MATHSTUB)
+#obj-$(CONFIG_MODMATH) += modmath.o
+#modmath-objs := hal/components/modmath.o $(MATHSTUB)
 obj-$(CONFIG_STREAMER) += streamer.o
 streamer-objs := hal/components/streamer.o $(MATHSTUB)
 obj-$(CONFIG_SAMPLER) += sampler.o
@@ -1511,6 +1604,12 @@ motmod-objs += libnml/posemath/sincos.o $(MATHSTUB)
 # vtexport-objs := hal/vtable-example/vtexport.o
 # vtexport-objs += hal/vtable-example/vcode.o
 
+obj-m += jplan.o
+jplan-objs := hal/jplanner/jplan.o
+
+obj-m += interpolate.o
+interpolate-objs := hal/interpolator/interpolate.o
+
 obj-m += icomp.o
 icomp-objs := hal/icomp-example/icomp.o
 
@@ -1644,7 +1743,14 @@ $(sort $(RTOBJS)) : $(OBJDIR)/%.o : %.c $(DEPDIR)/%.d
 	$(ECHO) Compiling realtime $<
 	@rm -f $@
 	@mkdir -p $(dir $@)
-	$(Q)$(CC) -c $(CPPFLAGS) $(OPT) $(DEBUG) $(EXTRA_CFLAGS) $< -o $@
+	$(Q)$(CC) -c $(OPT) $(DEBUG) $(EXTRA_CFLAGS) $< -o $@
+
+# Rules to make .o (object) files from .cc
+$(sort $(CXXRTOBJS)) : $(OBJDIR)/%.o : %.cc $(DEPDIR)/%.d
+	$(ECHO) Compiling realtime++ $<
+	@rm -f $@
+	@mkdir -p $(dir $@)
+	$(Q)$(CXX) -c $(OPT) $(DEBUG) $(RT_CXXFLAGS) $(EXTRA_CFLAGS) $< -o $@
 
 endif # end BUILD_SYS=user-dso
 
@@ -1678,14 +1784,18 @@ ifneq "$(filter normal user-dso,$(BUILD_SYS))" ""
 $(RTLIBDIR)/classicladder_rt$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(classicladder_rt-objs))
 $(RTLIBDIR)/boss_plc$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(boss_plc-objs))
 $(RTLIBDIR)/encoder$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(encoder-objs))
+$(RTLIBDIR)/encoderv2$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(encoderv2-objs))
 $(RTLIBDIR)/counter$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(counter-objs))
 $(RTLIBDIR)/encoder_ratio$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(encoder_ratio-objs))
+$(RTLIBDIR)/encoder_ratiov2$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(encoder_ratiov2-objs))
 $(RTLIBDIR)/stepgen$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(stepgen-objs))
+$(RTLIBDIR)/stepgenv2$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(stepgenv2-objs))
 $(RTLIBDIR)/lcd$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(lcd-objs))
 $(RTLIBDIR)/matrix_kb$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(matrix_kb-objs))
 $(RTLIBDIR)/mux_generic$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(mux_generic-objs))
 $(RTLIBDIR)/freqgen$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(freqgen-objs))
 $(RTLIBDIR)/pwmgen$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(pwmgen-objs))
+$(RTLIBDIR)/pwmgenv2$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(pwmgenv2-objs))
 $(RTLIBDIR)/siggen$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(siggen-objs))
 $(RTLIBDIR)/at_pid$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(at_pid-objs))
 $(RTLIBDIR)/threads$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(threads-objs))
@@ -1781,8 +1891,11 @@ $(RTLIBDIR)/hal_gm$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(hal_gm-objs))
 
 $(RTLIBDIR)/tp$(MODULE_EXT): $(addprefix $(OBJDIR)/,$(tp-objs))
 $(RTLIBDIR)/ufdemo$(MODULE_EXT):	$(addprefix $(OBJDIR)/,$(ufdemo-objs))
-$(RTLIBDIR)/icomp$(MODULE_EXT):	$(addprefix $(OBJDIR)/,$(icomp-objs))
+$(RTLIBDIR)/jplan$(MODULE_EXT):		$(addprefix $(OBJDIR)/,$(jplan-objs))
+$(RTLIBDIR)/interpolate$(MODULE_EXT):	$(addprefix $(OBJDIR)/,$(interpolate-objs))
+$(RTLIBDIR)/icomp$(MODULE_EXT):		$(addprefix $(OBJDIR)/,$(icomp-objs))
 $(RTLIBDIR)/lutn-demo$(MODULE_EXT):	$(addprefix $(OBJDIR)/,$(lutn-demo-objs))
+
 
 ifeq ($(TRIVIAL_BUILD),no)
 READ_RTDEPS = $(wildcard $(RTDEPS))

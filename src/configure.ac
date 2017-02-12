@@ -591,6 +591,9 @@ AC_ARG_WITH(platform-beaglebone,
 	    	TARGET_PLATFORM_BEAGLEBONE=true
 		platform_specified=true
 		platform_beaglebone_reason="$cmdl_enab_msg"
+		# see https://github.com/machinekit/machinekit/issues/629
+		ARCH_CFLAGS="-march=armv7-a -mtune=cortex-a8"
+		ARCH_CFLAGS="$ARCH_CFLAGS -mfloat-abi=hard -mfpu=neon -ffast-math"
 		;;
 	    (*)
 	    	TARGET_PLATFORM_BEAGLEBONE=false
@@ -1005,6 +1008,23 @@ PKG_CHECK_MODULES([LWS], libwebsockets,
         AC_DEFINE(HAVE_LWS, [], [libwebsockets library available])
 	USE_LWS=yes
    ],)
+
+AC_MSG_CHECKING(whether to build webtalk)
+AC_ARG_ENABLE(webtalk,
+    [  --enable-webtalk    build Webtalk],
+    [
+	if test "$USE_LWS" != "yes"; then
+	    AC_MSG_ERROR([Please install libwebsockets before building Webtalk.])
+	fi
+	BUILD_WEBTALK=yes
+        AC_MSG_RESULT([configuring to to build webtalk])
+    ],
+    [
+      AC_MSG_RESULT([not building webtalk])
+      BUILD_WEBTALK=no
+    ])
+
+
 
 PKG_CHECK_MODULES([SSL], libssl,
    [
@@ -1781,7 +1801,7 @@ fi
 
 AC_SUBST(BUILD_DEV)
 AC_SUBST(BUILD_PROTO_JS)
-
+AC_SUBST(BUILD_WEBTALK)
 
 AC_SUBST(BUILD_NMLDEP)
 if test "$BUILD_NMLDEP" = yes; then

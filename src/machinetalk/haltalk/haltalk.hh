@@ -51,7 +51,7 @@
 #include "mk-service.hh"
 #include "mk-zeroconf.hh"
 
-#include <machinetalk/protobuf/message.pb.h>
+#include <machinetalk/build/machinetalk/protobuf/message.pb.h>
 namespace gpb = google::protobuf;
 
 // announced protocol versions
@@ -100,7 +100,7 @@ typedef std::unordered_map<std::string, rcomp_t *> compmap_t;
 typedef compmap_t::iterator compmap_iterator;
 
 // HAL items indexed by handle
-typedef std::unordered_map<int, halitem_t *> itemmap_t;
+typedef std::unordered_map<int, hal_object_ptr> itemmap_t;
 typedef itemmap_t::iterator itemmap_iterator;
 
 #define NSVCS  3
@@ -141,8 +141,8 @@ typedef struct htself {
     bool      interrupted;
     pid_t     pid;
 
-    pb::Container rx; // any ParseFrom.. function does a Clear() first
-    pb::Container tx; // tx must be Clear()'d after or before use
+    machinetalk::Container rx; // any ParseFrom.. function does a Clear() first
+    machinetalk::Container tx; // tx must be Clear()'d after or before use
 
 
     groupmap_t groups;
