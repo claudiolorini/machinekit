@@ -748,7 +748,7 @@ static int init_rtcan()
     int n;
     int retval = 0;
     // TxTimeout = 100msec,  RxTimeout = 1000msec
-    nanosecs_rel_t txto = 100000000, rxto = 1000000000;
+    //nanosecs_rel_t txto = 100000000, rxto = 1000000000;
     //
     struct ifreq ifr[MAX_FOC_CHAN];
     // tx/rx socket addresses
@@ -796,7 +796,7 @@ static int init_rtcan()
         rtapi_print_msg(RTAPI_MSG_INFO, "HAL_ZTURN_CAN: Rx & Tx socket binded successfully.\n");
 
         // set Tx timeout in nsec
-        retval = ioctl(sock[n], RTCAN_RTIOC_SND_TIMEOUT, &txto);
+        // retval = ioctl(sock[n], RTCAN_RTIOC_SND_TIMEOUT, &txto);
         if (retval) {
             rtapi_print_msg(RTAPI_MSG_ERR, "HAL_ZTURN_CAN: ERROR: rt_dev_ioctl SND_TIMEOUT: %s\n", strerror(-retval));
             return -1;
