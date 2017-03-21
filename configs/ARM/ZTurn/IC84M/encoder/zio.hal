@@ -13,10 +13,10 @@ loadrt [EMCMOT]EMCMOT base_period_nsec=[EMCMOT]BASE_PERIOD servo_period_nsec=[EM
 #
 # GPIO connections:
 #
-# hal_zturn_gpio.pin-00-in A channel
-# hal_zturn_gpio.pin-01-in B channel
-# hal_zturn_gpio.pin-02-in loop cycle activation of axis
-# hal_zturn_gpio.pin-03-in emergency button
+# hal_zturn_gpio.pin-12-in A channel
+# hal_zturn_gpio.pin-13-in B channel
+# hal_zturn_gpio.pin-14-in loop cycle activation of axis
+# hal_zturn_gpio.pin-15-in emergency button
 #
 # hal_zturn_gpio.pin-01-out X axis active 
 # hal_zturn_gpio.pin-02-out Y axis active 
@@ -48,6 +48,7 @@ addf select8.0                              servo-thread
 
 # emergency stop
 net estop                                   <= hal_zturn_gpio.pin-15-in
+#net estop                                   => iocontrol.0.emc-enable-in
 net estop                                   => not.0.in
 net nestop                                  <= not.0.out
 net nestop                                  => iocontrol.0.emc-enable-in
