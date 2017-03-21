@@ -2,9 +2,8 @@
 #include "2FOC_status.h"
 
 #include "rtapi.h"         
-#include "rtapi_bitops.h"
 #include "rtapi_app.h"
-#include "hal.h"
+#include "rtapi_bitops.h"
 
 #if !defined(TARGET_PLATFORM_ZTURN)
   #error "This driver is for the Z-Turn platform only."
@@ -13,6 +12,9 @@
 MODULE_AUTHOR("Claudio Lorini");
 MODULE_DESCRIPTION("CAN Driver for 2FOC controller.");
 MODULE_LICENSE("GPL");
+
+/** \brief maximum number of FOC channels */
+#define MAX_FOC_CHAN 8
 
 // 2FOC mirror data
 /** \brief this data is continuously updated with the contents of the CAN status 
@@ -48,6 +50,10 @@ typedef struct {
 /** \brief number of FOC channels configured */
 static int num_chan = 0;
 
+/** \brief rt-can interface number  */
+int can_ifn[MAX_FOC_CHAN] = { -1,-1,-1,-1,-1,-1,-1,-1 };
+RTAPI_MP_ARRAY_INT(can_ifn, MAX_FOC_CHAN, "CAN channel number for up to 8 lines");
+
 // RT component ID
 static int comp_id;
 
@@ -56,6 +62,37 @@ static FOC_data_t *FOC_data_array = NULL;
 
 static void rtcan_periodic_send(void *arg, long period)
 {
+}
+
+/** 
+ \brief Parse module parameters: CAN interface number and the CAN address of the 2FOC connected (p2p)
+   Initialize the number of correctly parametrized channels 
+ \return 
+   -1         in case of error 
+    0         everithing ok 
+    num_chan  number of configured channels */
+static int Parse_Module_Parameters()
+{    
+    int n;
+
+    for(n = 0; (n < MAX_FOC_CHAN) && (can_ifn[n] != -1) ; n++) {
+        // check for a valid rtcan interface number (0..7) 
+        if( (can_ifn[n] < 0) || ( can_ifn[n] > 7) ) {
+            rtapi_print_msg(RTAPI_MSG_ERR, "HAL_ZTURN_CAN: ERROR: bad rtcan interface number %i", can_ifn[n]);
+            return -1;
+        }
+        // found a correctly configured channel(s)
+        num_chan++;
+        // report interface number and the connected 2FOC can address
+        rtapi_print_msg(RTAPI_MSG_INFO, "HAL_ZTURN_CAN: FOC axis %d @ can%d interface.",
+            n, can_ifn[n] );
+    }
+    if( (0 == num_chan) || (8 < num_chan) ) {
+        rtapi_print_msg(RTAPI_MSG_ERR, "HAL_ZTURN_CAN: ERROR: invalid number of channels: %d.", num_chan);
+        return -1;
+    }
+    // ok.
+    return 0;
 }
 
 /**
@@ -102,6 +139,9 @@ int rtapi_app_main(void)
         hal_exit(comp_id);
         return -1;
     }
+
+    // determine driver parameters (number of can and address) 
+    Parse_Module_Parameters();
 
     // allocate shared memory for FOC_data of each axis
     if( 0 != allocate_foc_data() ) {
