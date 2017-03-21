@@ -50,9 +50,14 @@ typedef struct {
 /** \brief number of FOC channels configured */
 static int num_chan = 0;
 
-/** \brief rt-can interface number  */
-int can_ifn[MAX_FOC_CHAN] = { -1,-1,-1,-1,-1,-1,-1,-1 };
+/** \brief can interface number  */
+int can_ifn[MAX_FOC_CHAN] =  { [0 ... MAX_FOC_CHAN-1] = -1 };
 RTAPI_MP_ARRAY_INT(can_ifn, MAX_FOC_CHAN, "CAN channel number for up to 8 lines");
+
+/** \brief can address of the board connected to the can line 
+by default all 2FOC boards have adx=3 */
+int can_addr[MAX_FOC_CHAN] =  { [0 ... MAX_FOC_CHAN-1] = 3 };
+RTAPI_MP_ARRAY_INT(can_addr, MAX_FOC_CHAN, "CAN address of the board connected to the line");
 
 // RT component ID
 static int comp_id;
